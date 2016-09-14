@@ -8,9 +8,22 @@
 
 #import <Foundation/Foundation.h>
 
-@protocol GameDelegate <NSObject>
+@protocol GameViewDelegate <NSObject>
+
+- (void)setRestartButtonHightlighted:(BOOL)hightlighted;
+- (void)setRestartButtonImageForNormal;
+- (void)setRestartButtonImageForWinning;
+- (void)setRestartButtonImageForFailure;
+- (void)setMinesNum:(int)minesNum;
+- (void)setSeconds:(int)seconds;
+
+@end
+
+
+@protocol GameControlDelegate <NSObject>
 
 - (void)getReadyForNewGame;
+- (void)getPlayerName;
 - (void)showTopList;
 - (void)askIfReload;
 

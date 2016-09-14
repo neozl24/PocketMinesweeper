@@ -17,7 +17,6 @@
     if (self) {
         width = frame.size.width;
         height = frame.size.height;
-        delegate = self.superview;
         
         restartButton = [UIButton buttonWithType:UIButtonTypeCustom];
         [restartButton setFrame:CGRectMake(width/2 - 0.3*height, 0.2*height, 0.6*height, 0.6*height)];

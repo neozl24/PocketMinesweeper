@@ -10,7 +10,7 @@
 #import "GameDelegate.h"
 #import "DigitView.h"
 
-@interface InformationBoard : UIView {
+@interface InformationBoard : UIView <GameViewDelegate> {
     float width;
     float height;
     DigitView* minesNumView;
@@ -20,14 +20,6 @@
     UIButton* reloadButton;
 }
 
-@property (nonatomic, weak) id delegate;
-
-- (void)setMinesNum:(int)num;
-- (void)setSeconds:(int)seconds;
-
-- (void)setRestartButtonHightlighted:(BOOL)state;
-- (void)setRestartButtonImageForWinning;
-- (void)setRestartButtonImageForFailure;
-- (void)setRestartButtonImageForNormal;
+@property (nonatomic, weak) id <GameControlDelegate> delegate;
 
 @end

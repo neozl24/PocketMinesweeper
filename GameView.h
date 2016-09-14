@@ -16,13 +16,11 @@ struct IntPoint {
 };
 typedef struct IntPoint IntPoint;
 
-@interface GameView : UIView {
-    int rowNum, colNum;
-    int totalMines;
-    int minesLeftToMark;
+
+@interface GameView : UIView{
+    
     int numOfCellsOpened;
-    CGFloat side;
-    double timeUsed;
+    int minesLeftToMark;
     
     BOOL hasBegun;
     BOOL hasEnded;
@@ -34,12 +32,23 @@ typedef struct IntPoint IntPoint;
     NSMutableSet* minePointSet;
     NSMutableSet* markedPointSet;
 
+    NSTimer* gameTimer;
 }
+
+@property (nonatomic) int rowNum, colNum;
+@property (nonatomic) int totalMines;
+@property (nonatomic) double timeUsed;
+@property (nonatomic) CGFloat side;
+@property (nonatomic, weak) id <GameViewDelegate> delegateToShow;
+@property (nonatomic, weak) id <GameControlDelegate> delegateToControl;
 
 - (void)addGestureRecognizers;
 
 - (void)getReadyForNewGame;
 - (void)endGame;
+
+- (void)createCells;
+- (void)recreateCellsWithStartPoint:(IntPoint)cellPoint;
 
 - (IntPoint)transformToIntPointFromViewPoint:(CGPoint)viewPoint;
 
@@ -53,3 +62,10 @@ typedef struct IntPoint IntPoint;
 
 
 @end
+
+
+
+
+
+
+
