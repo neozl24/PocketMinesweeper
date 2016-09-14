@@ -42,6 +42,8 @@ typedef struct IntPoint IntPoint;
 @property (nonatomic, weak) id <GameViewDelegate> delegateToShow;
 @property (nonatomic, weak) id <GameControlDelegate> delegateToControl;
 
+- (instancetype)initWithFrame:(CGRect)frame rowNum:(int)rowNum colNum:(int)colNum side:(CGFloat)side;
+
 - (void)addGestureRecognizers;
 
 - (void)getReadyForNewGame;
@@ -59,8 +61,6 @@ typedef struct IntPoint IntPoint;
 - (NSArray*)arrayOfSurroundingPointsOfRow:(int)i column:(int)j;
 
 - (void)updateTimer;
-- (void)updateDisplay;
-
 
 @end
 

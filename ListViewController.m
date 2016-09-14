@@ -135,7 +135,7 @@
         [cell.contentView addSubview:nameLabel];
         
         UILabel* timeLabel = [[UILabel alloc] init];
-        timeLabel.text = [NSString stringWithFormat:@"%.1f 秒", record.time];
+        timeLabel.text = [NSString stringWithFormat:@"%.2f 秒", record.time];
         timeLabel.textColor = [UIColor colorWithWhite:0.4 alpha:1];
         timeLabel.translatesAutoresizingMaskIntoConstraints = NO;
         [cell.contentView addSubview:timeLabel];

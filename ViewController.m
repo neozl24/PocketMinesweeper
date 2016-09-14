@@ -8,9 +8,7 @@
 
 #import "ViewController.h"
 #import "ListViewController.h"
-#import "Record.h"
 #import "RecordList.h"
-#import "CellView.h"
 #import "InformationBoard.h"
 #import "GameView.h"
 
@@ -25,7 +23,6 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    //[NSThread sleepForTimeInterval:3.0];
     
     version = [[UIDevice currentDevice].systemVersion doubleValue];
     
@@ -52,21 +49,13 @@
     CGFloat side = width / colNum;
     int rowNum = height/ side - 2.7;
     CGFloat gameViewHeight = width * rowNum/colNum;
-    
     CGRect frameBeforeLoading = CGRectMake(0, height, width, gameViewHeight);
     CGRect frameAfterLoading = CGRectMake(0, height - gameViewHeight, width, gameViewHeight);
     
-    gameView = [[GameView alloc] initWithFrame:frameBeforeLoading];
+    gameView = [[GameView alloc] initWithFrame:frameBeforeLoading rowNum:rowNum colNum:colNum side:side];
     [self.view addSubview:gameView];
     
     [UIView animateWithDuration:0.6 delay:0.2 options:UIViewAnimationOptionCurveEaseOut animations:^(){gameView.frame = frameAfterLoading;} completion:nil];
-    
-    [gameView createCells];
-    [gameView addGestureRecognizers];
-    
-    
-    //准备好新开一局游戏，执行该函数后，用户的第一次点击将初始化好所有格子
-    [gameView getReadyForNewGame];
     
     CGRect boardFrameAfterLoading = CGRectMake(0, 0, width, 2 * side);
     CGRect boardFrameBeforeLoading = CGRectMake(0, -4 * side, width, 2 * side);
@@ -79,6 +68,9 @@
     gameView.delegateToControl = self;
     gameView.delegateToShow = boardView;
     boardView.delegate = self;
+    
+    //准备好新开一局游戏，执行该函数后，用户的第一次点击将初始化好所有格子
+    [gameView getReadyForNewGame];
 }
 
 - (void)reloadGame {

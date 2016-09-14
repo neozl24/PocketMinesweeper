@@ -14,12 +14,16 @@
 @synthesize delegateToShow, delegateToControl;
 @synthesize rowNum, colNum, totalMines, timeUsed, side;
 
-- (instancetype)initWithFrame:(CGRect)frame {
+- (instancetype)initWithFrame:(CGRect)frame rowNum:(int)rows colNum:(int)columns side:(CGFloat)sideLength {
     self = [super initWithFrame:frame];
-    colNum = frame.size.width / 40.0;
-    side = frame.size.width / colNum;
-    rowNum = frame.size.height / side;
-    totalMines = colNum * rowNum / 6.4;
+    if (self) {
+        rowNum = rows;
+        colNum = columns;
+        side = sideLength;
+    }
+    
+    [self createCells];
+    [self addGestureRecognizers];
     return self;
 }
 
@@ -27,6 +31,8 @@
     hasBegun = NO;
     hasEnded = NO;
     success = NO;
+    
+    totalMines = colNum * rowNum / 6.4;
     numOfCellsOpened = 0;
     timeUsed = 0;
     minesLeftToMark = totalMines;
@@ -35,6 +41,9 @@
     minePointSet = [[NSMutableSet alloc] init];
     markedPointSet = [[NSMutableSet alloc] init];
     
+    //如果在上一局没有结束的情况下按了restart键，则需要手动结束上一局的gameTimer
+    [gameTimer invalidate];
+    
     [self setUserInteractionEnabled:YES];
     
     for (int i = 0; i < rowNum; i++) {
@@ -42,9 +51,6 @@
             [matrix[i][j] reset];
         }
     }
-    
-    //如果在上一局没有结束的情况下按了restart键，则需要手动结束上一局的gameTimer
-    [gameTimer invalidate];
     
     [delegateToShow setRestartButtonImageForNormal];
     [delegateToShow setMinesNum:minesLeftToMark];
@@ -69,16 +75,17 @@
     IntPoint cellPoint = [self transformToIntPointFromViewPoint:[sender locationInView:self]];
     
     if (sender.state == UIGestureRecognizerStateEnded) {
-        if (hasBegun == NO && ((CellView*)matrix[cellPoint.y][cellPoint.x]).marked == NO) {\
+        if (hasBegun == NO && ((CellView*)matrix[cellPoint.y][cellPoint.x]).marked == NO) {
             //若此次点击是首次点击，则重新绘制棋盘，并开始计时
             [self recreateCellsWithStartPoint:cellPoint];
             hasBegun = YES;
             
-            gameTimer = [NSTimer scheduledTimerWithTimeInterval:0.1 target:self selector:@selector(updateTimer) userInfo:nil repeats:YES];
+            gameTimer = [NSTimer scheduledTimerWithTimeInterval:0.01 target:self selector:@selector(updateTimer) userInfo:nil repeats:YES];
         }
         [self openCellOfRow:cellPoint.y column:cellPoint.x];
     }
-    [self updateDisplay];
+    
+    [delegateToShow setRestartButtonHightlighted:NO];
 }
 
 - (void)handleDoubleTap:(UITapGestureRecognizer*)sender {
@@ -88,7 +95,7 @@
         [self doubleClickOpenRow:cellPoint.y column:cellPoint.x];
     }
     
-    [self updateDisplay];
+    [delegateToShow setRestartButtonHightlighted:NO];
 }
 
 - (void)handleLongPress:(UISwipeGestureRecognizer*)sender {
@@ -102,16 +109,17 @@
 - (void)handleSwipe:(UISwipeGestureRecognizer*)sender {
     IntPoint cellPoint = [self transformToIntPointFromViewPoint:[sender locationInView:self]];
     CellView* swipeCell = matrix[cellPoint.y][cellPoint.x];
-    if (swipeCell.marked == NO) {
+    if (swipeCell.marked == NO && swipeCell.detected == NO) {
         minesLeftToMark -= 1;
         [markedPointSet addObject:[NSValue valueWithCGPoint:CGPointMake(cellPoint.x, cellPoint.y)]];
-    } else {
+    } else if (swipeCell.marked == YES) {
         minesLeftToMark += 1;
         [markedPointSet removeObject:[NSValue valueWithCGPoint:CGPointMake(cellPoint.x, cellPoint.y)]];
     }
     [swipeCell mark];
     
-    [self updateDisplay];
+    [delegateToShow setMinesNum:minesLeftToMark];
+    [delegateToShow setRestartButtonHightlighted:NO];
 }
 
 
@@ -143,7 +151,7 @@
         [pressedPointSet removeObject:element];
     }
     
-    [self updateDisplay];
+    [delegateToShow setRestartButtonHightlighted:NO];
 }
 
 - (IntPoint)transformToIntPointFromViewPoint:(CGPoint)viewPoint {
@@ -219,7 +227,7 @@
 }
 
 - (void)updateTimer {
-    timeUsed += 0.1;
+    timeUsed += 0.01;
     [delegateToShow setSeconds:(int)timeUsed];
 }
 
@@ -343,11 +351,6 @@
         arrayOfSurroundingPoints = @[[NSValue valueWithCGPoint:CGPointMake(j, i-1)], [NSValue valueWithCGPoint:CGPointMake(j+1, i-1)], [NSValue valueWithCGPoint:CGPointMake(j+1, i)], [NSValue valueWithCGPoint:CGPointMake(j+1, i+1)], [NSValue valueWithCGPoint:CGPointMake(j, i+1)], [NSValue valueWithCGPoint:CGPointMake(j-1, i+1)], [NSValue valueWithCGPoint:CGPointMake(j-1, i)], [NSValue valueWithCGPoint:CGPointMake(j-1, i-1)]];
     }
     return arrayOfSurroundingPoints;
-}
-
-- (void)updateDisplay {
-    [delegateToShow setMinesNum:minesLeftToMark];
-    [delegateToShow setRestartButtonHightlighted:NO];
 }
 
 
