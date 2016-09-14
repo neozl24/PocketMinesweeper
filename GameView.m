@@ -78,7 +78,7 @@
         }
         [self openCellOfRow:cellPoint.y column:cellPoint.x];
     }
-    [self amend];
+    [self updateDisplay];
 }
 
 - (void)handleDoubleTap:(UITapGestureRecognizer*)sender {
@@ -88,7 +88,7 @@
         [self doubleClickOpenRow:cellPoint.y column:cellPoint.x];
     }
     
-    [self amend];
+    [self updateDisplay];
 }
 
 - (void)handleLongPress:(UISwipeGestureRecognizer*)sender {
@@ -111,7 +111,7 @@
     }
     [swipeCell mark];
     
-    [self amend];
+    [self updateDisplay];
 }
 
 
@@ -143,7 +143,7 @@
         [pressedPointSet removeObject:element];
     }
     
-    [self amend];
+    [self updateDisplay];
 }
 
 - (IntPoint)transformToIntPointFromViewPoint:(CGPoint)viewPoint {
@@ -345,7 +345,7 @@
     return arrayOfSurroundingPoints;
 }
 
-- (void)amend {
+- (void)updateDisplay {
     [delegateToShow setMinesNum:minesLeftToMark];
     [delegateToShow setRestartButtonHightlighted:NO];
 }

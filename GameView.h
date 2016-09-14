@@ -58,7 +58,8 @@ typedef struct IntPoint IntPoint;
 
 - (NSArray*)arrayOfSurroundingPointsOfRow:(int)i column:(int)j;
 
-- (void)amend;
+- (void)updateTimer;
+- (void)updateDisplay;
 
 
 @end
