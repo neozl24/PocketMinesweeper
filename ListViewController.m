@@ -12,7 +12,6 @@
 #import "Record.h"
 
 @interface ListViewController () {
-    double version;
     NSMutableSet* selectedIndexPathSet;
 }
 
@@ -27,11 +26,7 @@
     
     selectedIndexPathSet = [[NSMutableSet alloc] init];
     
-    version = [[UIDevice currentDevice].systemVersion doubleValue];
-    if (version >= 7.0) {
-        self.tableView.estimatedRowHeight = 44.0;
-        
-    }
+    self.tableView.estimatedRowHeight = 44.0;
       
 //    下面这一句如果只是加在init中，到了这一步又被自动改成YES了。
     self.navigationController.navigationBar.translucent = NO;
@@ -58,9 +53,7 @@
 
 - (void)showStatusBar {
     isStatusBarHidden = NO;
-    if (version >= 7.0) {
-        [UIView animateWithDuration:0.5 animations:^{[self setNeedsStatusBarAppearanceUpdate];}];
-    }
+    [UIView animateWithDuration:0.5 animations:^{[self setNeedsStatusBarAppearanceUpdate];}];
 }
 
 - (instancetype)init {

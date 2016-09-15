@@ -48,21 +48,18 @@
         [self addSubview:showListButton];
         
         //只有在ios8.0以上的ipad上才添加重置界面的按钮(只有ipad的屏幕才能旋转)
-        if ([[UIDevice currentDevice].systemVersion doubleValue] >= 8.0
-            && [UIScreen mainScreen].bounds.size.width >= 768) {
-            reloadButton = [UIButton buttonWithType:UIButtonTypeSystem];
-            [reloadButton setFrame:CGRectMake(-height, 0.3*height, 0.4*height, 0.4*height)];
-            reloadButton.titleLabel.textAlignment = NSTextAlignmentCenter;
-            [reloadButton setTitle:@"↻" forState:UIControlStateNormal];
-            [reloadButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
-            reloadButton.titleLabel.font = [UIFont systemFontOfSize:(int)(0.45*height)];
-            [reloadButton addTarget:delegate action:@selector(askIfReload) forControlEvents:UIControlEventTouchUpInside];
-            [self addSubview:reloadButton];
-            
-            [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(showReloadButton) name:UIApplicationDidChangeStatusBarOrientationNotification object:nil];
-        }
+        reloadButton = [UIButton buttonWithType:UIButtonTypeSystem];
+        [reloadButton setFrame:CGRectMake(-height, 0.3*height, 0.4*height, 0.4*height)];
+        reloadButton.titleLabel.textAlignment = NSTextAlignmentCenter;
+        [reloadButton setTitle:@"↻" forState:UIControlStateNormal];
+        [reloadButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+        reloadButton.titleLabel.font = [UIFont systemFontOfSize:(int)(0.45*height)];
+        [reloadButton addTarget:delegate action:@selector(askIfReload) forControlEvents:UIControlEventTouchUpInside];
+        [self addSubview:reloadButton];
         
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(showReloadButton) name:UIApplicationDidChangeStatusBarOrientationNotification object:nil];
         
+                
     }
     return self;
 }

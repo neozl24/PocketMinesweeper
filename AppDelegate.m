@@ -18,10 +18,7 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
-    
-    //下面这行是对iOS6的
-    [[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:YES];
-    
+
     return YES;
 }
 

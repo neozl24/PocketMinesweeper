@@ -13,9 +13,7 @@
 #import "GameView.h"
 
 
-@interface ViewController () {
-    double version;
-}
+@interface ViewController ()
 
 @end
 
@@ -23,8 +21,6 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
-    version = [[UIDevice currentDevice].systemVersion doubleValue];
     
     //这一行是为了提前初始化RecordList，以免在第一次成功完成游戏时，等待输入框弹出时间过长
     [RecordList sharedList];
@@ -85,40 +81,22 @@
 
 - (void)getPlayerName {
     
-    if (version < 8.0) {
-        UIAlertView* alertView = [[UIAlertView alloc] initWithTitle:@"阁下尊姓大名?" message:@"恭喜你刷新了排行榜" delegate:self cancelButtonTitle:@"确定" otherButtonTitles:nil];
-        alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
-        UITextField* nameTextField = [alertView textFieldAtIndex:0];
-        nameTextField.placeholder = @"您的大名";
-        [alertView show];
+    UIAlertController* alertController = [UIAlertController alertControllerWithTitle:@"阁下尊姓大名?" message:@"恭喜你刷新了排行榜" preferredStyle:UIAlertControllerStyleAlert];
+    [alertController addTextFieldWithConfigurationHandler:^(UITextField* textField){
+        textField.placeholder = @"您的大名";
+        textField.delegate = self;
+    }];
+    
+    UIAlertAction* action = [UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleDefault handler:^(UIAlertAction* action){
+        UITextField* nameTextField = alertController.textFields.firstObject;
+        name = nameTextField.text;
         
-    } else {
-        UIAlertController* alertController = [UIAlertController alertControllerWithTitle:@"阁下尊姓大名?" message:@"恭喜你刷新了排行榜" preferredStyle:UIAlertControllerStyleAlert];
-        [alertController addTextFieldWithConfigurationHandler:^(UITextField* textField){
-            textField.placeholder = @"您的大名";
-            textField.delegate = self;
-        }];
-        
-        UIAlertAction* action = [UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleDefault handler:^(UIAlertAction* action){
-            UITextField* nameTextField = alertController.textFields.firstObject;
-            name = nameTextField.text;
-            
-            [[RecordList sharedList] updateTopListWithName:name time:gameView.timeUsed rowNum:gameView.rowNum colNum:gameView.colNum mineNum:gameView.totalMines];
-        }];
-        [alertController addAction:action];
-        
-        [self presentViewController:alertController animated:YES completion:nil];
-    }
-}
+        [[RecordList sharedList] updateTopListWithName:name time:gameView.timeUsed rowNum:gameView.rowNum colNum:gameView.colNum mineNum:gameView.totalMines];
+    }];
+    [alertController addAction:action];
+    
+    [self presentViewController:alertController animated:YES completion:nil];
 
-//实现委托方法，控制输入名字的长度。但是这个方法也有问题，如果我是粘贴的，就不受其限制了，而且一旦超长了，还不能删除，整个字符串都被定住了，所以我把截取字符串的工作放到了显示部分。
-//- (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string {
-//    return (range.location < 20);
-//}
-
-- (void)alertView:(UIAlertView*)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
-    name = [alertView textFieldAtIndex:0].text;
-    [[RecordList sharedList] updateTopListWithName:name time:gameView.timeUsed rowNum:gameView.rowNum colNum:gameView.colNum mineNum:gameView.totalMines];
 }
 
 - (void)showTopList {
@@ -132,10 +110,6 @@
 }
 
 - (void)askIfReload {
-    //这个函数只会在ios8.0及以上的情况下才会运行
-    if (version < 8.0) {
-        return;
-    }
     
     UIAlertController* alertController = [UIAlertController alertControllerWithTitle:@"重新绘制界面" message:@"旋转iPad屏幕会导致界面失调，点击重置将按当前屏幕方向重新绘制界面。\n\n你也可以点击取消，并旋转回之前的屏幕方向继续游戏。" preferredStyle:UIAlertControllerStyleAlert];
     
