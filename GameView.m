@@ -8,9 +8,9 @@
 
 #import <GameKit/GameKit.h>
 #import "GameView.h"
+#import "Record.h"
 #import "RecordList.h"
 #import "PlayerModel.h"
-#import "Record.h"
 
 @implementation GameView
 
