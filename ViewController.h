@@ -13,14 +13,15 @@
 @class InformationBoard, GameView;
 
 @interface ViewController : UIViewController <UITextFieldDelegate, GameControlDelegate> {
-    
+
+    UIImageView* backgroundImageView;
     GameView* gameView;
     InformationBoard* boardView;
-    NSString* name;
 }
 
 - (void)loadGame;
 - (void)reloadGame;
+
 
 @end
 

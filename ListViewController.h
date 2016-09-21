@@ -7,8 +7,12 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <GameKit/GameKit.h>
+#import "GameDelegate.h"
 #import "Record.h"
 
-@interface ListViewController : UITableViewController 
+@interface ListViewController : UITableViewController <GKGameCenterControllerDelegate>
+
+@property (nonatomic, weak) id <GameControlDelegate> delegate;
 
 @end

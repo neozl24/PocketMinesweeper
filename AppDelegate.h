@@ -7,12 +7,17 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <GameKit/GameKit.h>
 #import "ViewController.h"
 
-@interface AppDelegate : UIResponder <UIApplicationDelegate>
+@interface AppDelegate : UIResponder <UIApplicationDelegate> {
+    ViewController* mainViewController;
+}
 
 @property (strong, nonatomic) UIWindow *window;
 
+@property NSString* currentPlayerID;
+@property BOOL gameCenterAuthenticationComplete;
 
 @end
 

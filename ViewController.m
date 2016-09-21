@@ -19,8 +19,15 @@
 
 @implementation ViewController
 
+
 - (void)viewDidLoad {
     [super viewDidLoad];
+    
+    backgroundImageView = [[UIImageView alloc] initWithFrame:self.view.frame];
+    backgroundImageView.image = [UIImage imageNamed:@"background"];
+    backgroundImageView.contentMode = UIViewContentModeScaleAspectFill;
+    [self.view addSubview:backgroundImageView];
+
     
     //这一行是为了提前初始化RecordList，以免在第一次成功完成游戏时，等待输入框弹出时间过长
     [RecordList sharedList];
@@ -36,6 +43,7 @@
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
 }
+
 
 - (void)loadGame {
     
@@ -72,11 +80,21 @@
 - (void)reloadGame {
     [gameView removeFromSuperview];
     [boardView removeFromSuperview];
+    backgroundImageView.frame = self.view.frame;
+    
     [self loadGame];
 }
 
 - (void)getReadyForNewGame {
     [gameView getReadyForNewGame];
+}
+
+- (void)pauseGame {
+    [gameView.gameTimer setFireDate:[NSDate distantFuture]];
+}
+
+- (void)continueGame {
+    [gameView.gameTimer setFireDate:[NSDate date]];
 }
 
 - (void)getPlayerName {
@@ -89,7 +107,7 @@
     
     UIAlertAction* action = [UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleDefault handler:^(UIAlertAction* action){
         UITextField* nameTextField = alertController.textFields.firstObject;
-        name = nameTextField.text;
+        NSString* name = nameTextField.text;
         
         [[RecordList sharedList] updateTopListWithName:name time:gameView.timeUsed rowNum:gameView.rowNum colNum:gameView.colNum mineNum:gameView.totalMines];
     }];
@@ -100,18 +118,21 @@
 }
 
 - (void)showTopList {
+    [self pauseGame];
+    
     ListViewController* listViewController = [[ListViewController alloc] init];
     [listViewController setModalTransitionStyle:UIModalTransitionStyleCoverVertical];
+    listViewController.delegate = self;
     
     UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:listViewController];
-    navController.navigationBar.topItem.title = @"英雄榜";
     
     [self presentViewController:navController animated:YES completion:nil];
 }
 
 - (void)askIfReload {
     
-    UIAlertController* alertController = [UIAlertController alertControllerWithTitle:@"重新绘制界面" message:@"旋转iPad屏幕会导致界面失调，点击重置将按当前屏幕方向重新绘制界面。\n\n你也可以点击取消，并旋转回之前的屏幕方向继续游戏。" preferredStyle:UIAlertControllerStyleAlert];
+    NSString* message = @"旋转iPad屏幕会导致界面失调，点击重置将按当前屏幕方向重新绘制界面。\n\n你也可以点击取消，并旋转回之前的屏幕方向继续游戏。";
+    UIAlertController* alertController = [UIAlertController alertControllerWithTitle:@"重新绘制界面" message:message preferredStyle:UIAlertControllerStyleAlert];
     
     UIAlertAction* actionCancel = [UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:nil];
     [alertController addAction:actionCancel];
@@ -120,7 +141,6 @@
         [self reloadGame];
     }];
     [alertController addAction:actionConfirm];
-    
     
     [self presentViewController:alertController animated:YES completion:nil];
 }

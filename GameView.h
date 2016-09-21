@@ -32,13 +32,14 @@ typedef struct IntPoint IntPoint;
     NSMutableSet* minePointSet;
     NSMutableSet* markedPointSet;
 
-    NSTimer* gameTimer;
 }
 
 @property (nonatomic) int rowNum, colNum;
 @property (nonatomic) int totalMines;
 @property (nonatomic) double timeUsed;
 @property (nonatomic) CGFloat side;
+@property (nonatomic) NSTimer* gameTimer;
+
 @property (nonatomic, weak) id <GameViewDelegate> delegateToShow;
 @property (nonatomic, weak) id <GameControlDelegate> delegateToControl;
 
@@ -61,6 +62,8 @@ typedef struct IntPoint IntPoint;
 - (NSArray*)arrayOfSurroundingPointsOfRow:(int)i column:(int)j;
 
 - (void)updateTimer;
+
+- (void)vibrate;
 
 @end
 

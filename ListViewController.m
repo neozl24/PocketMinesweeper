@@ -13,13 +13,15 @@
 
 @interface ListViewController () {
     NSMutableSet* selectedIndexPathSet;
+    BOOL isStatusBarHidden;
+    BOOL forbiddenVibrate;
 }
 
 @end
 
-@implementation ListViewController {
-    BOOL isStatusBarHidden;
-}
+@implementation ListViewController
+
+@synthesize delegate;
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -31,6 +33,11 @@
 //    下面这一句如果只是加在init中，到了这一步又被自动改成YES了。
     self.navigationController.navigationBar.translucent = NO;
     
+    self.navigationItem.title = @"英雄榜";
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"完成" style:UIBarButtonItemStylePlain target:self action:@selector(getBackToGame)];
+    
+    //第一次调用这个值时得到的是0，即为NO
+    forbiddenVibrate = [[NSUserDefaults standardUserDefaults] boolForKey:@"forbiddenVibrate"];    
 }
 
 - (void)didReceiveMemoryWarning {
@@ -64,17 +71,15 @@
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    return 3;
+    return 2;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
 
     if (section == 0) {
         return [[RecordList sharedList] allRecords].count;
-    } else if (section == 1) {
-        return 1;
     } else {
-        return 1;
+        return 3;
     }
 }
 
@@ -219,16 +224,28 @@
         
         
     } else if (indexPath.section == 1) {
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"linkCell"];
-        cell.textLabel.text = @"操作说明";
-        cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
         
         
-    } else if (indexPath.section == 2) {
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"simpleCell"];
-        cell.textLabel.text = @"返回游戏";
-        cell.textLabel.textAlignment = NSTextAlignmentCenter;
-        cell.textLabel.textColor = [UIColor colorWithRed:0.18 green:0.57 blue:1.0 alpha:1.0];
+        if (indexPath.row == 0) {
+            cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"switchCell"];
+            [cell setSelectionStyle:UITableViewCellSelectionStyleNone];
+            cell.textLabel.text = @"震动";
+            UISwitch* switchView = [[UISwitch alloc] init];
+            [switchView setOn: !forbiddenVibrate];
+            [switchView addTarget:self action:@selector(updateVibrationSwitch:) forControlEvents:UIControlEventValueChanged];
+            cell.accessoryView = switchView;
+            
+        } else if (indexPath.row == 1) {
+            cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"linkCell"];
+            cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+            cell.textLabel.text = @"操作说明";
+            
+        } else if (indexPath.row == 2) {
+            cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"linkCell"];
+            cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+            cell.textLabel.text = @"GameCenter排行";
+        }
+        
     }
     
     return cell;
@@ -246,20 +263,40 @@
         
         
     } else if (indexPath.section == 1) {
-        InstructionViewController* instructionViewController = [[InstructionViewController alloc] init];
-        [self.navigationController pushViewController:instructionViewController animated:YES];
+        if (indexPath.row == 1) {
+            InstructionViewController* instructionViewController = [[InstructionViewController alloc] init];
+            [self.navigationController pushViewController:instructionViewController animated:YES];
+            
+        } else if (indexPath.row == 2) {
+            GKGameCenterViewController * gcViewController = [[GKGameCenterViewController alloc] init];
+            gcViewController.gameCenterDelegate = self;
+            [self presentViewController:gcViewController animated:YES completion:nil];
+            
+            [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
+        }
         
-    } else if (indexPath.section == 2) {
-        [self dismissViewControllerAnimated:YES completion:nil];
     }
 }
 
 - (void)tableView:(UITableView *)tableView didDeselectRowAtIndexPath:(NSIndexPath *)indexPath {
     if (indexPath.section == 0) {
         [selectedIndexPathSet removeObject:indexPath];
-        NSLog(@"%@",selectedIndexPathSet);
     }
 }
 
+- (IBAction)updateVibrationSwitch:(id)sender {
+    forbiddenVibrate = !forbiddenVibrate;
+    [[NSUserDefaults standardUserDefaults] setBool:forbiddenVibrate forKey:@"forbiddenVibrate"];
+}
+
+- (void)getBackToGame {
+    [self dismissViewControllerAnimated:YES completion:^{
+        [delegate continueGame];
+    }];
+}
+
+- (void)gameCenterViewControllerDidFinish:(GKGameCenterViewController *)gameCenterViewController {
+    [self dismissViewControllerAnimated:YES completion:nil];
+}
 
 @end

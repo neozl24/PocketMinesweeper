@@ -23,6 +23,9 @@
 @protocol GameControlDelegate <NSObject>
 
 - (void)getReadyForNewGame;
+- (void)pauseGame;
+- (void)continueGame;
+
 - (void)getPlayerName;
 - (void)showTopList;
 - (void)askIfReload;

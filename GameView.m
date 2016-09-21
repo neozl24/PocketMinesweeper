@@ -6,13 +6,17 @@
 //  Copyright © 2016年 钟立. All rights reserved.
 //
 
+#import <GameKit/GameKit.h>
 #import "GameView.h"
 #import "RecordList.h"
+#import "PlayerModel.h"
+#import "Record.h"
 
 @implementation GameView
 
 @synthesize delegateToShow, delegateToControl;
 @synthesize rowNum, colNum, totalMines, timeUsed, side;
+@synthesize gameTimer;
 
 - (instancetype)initWithFrame:(CGRect)frame rowNum:(int)rows colNum:(int)columns side:(CGFloat)sideLength {
     self = [super initWithFrame:frame];
@@ -259,9 +263,30 @@
         
         if ([[RecordList sharedList] checkNeedToUpdateWithTime:timeUsed] == YES) {
             [delegateToControl getPlayerName];
+            
+            //游戏失败震一下，成功震两下，如果破本地纪录再震第三下
+            [self performSelector:@selector(vibrate) withObject:nil afterDelay:1.5];
         }
+        
+        NSString* name = [GKLocalPlayer localPlayer].displayName;
+        
+        NSDate* currentDate = [NSDate date];
+        NSDateFormatter* dateFormatter = [[NSDateFormatter alloc] init];
+        [dateFormatter setDateFormat:@"YYYY/MM/dd"];
+        NSString* dateString = [dateFormatter stringFromDate:currentDate];
+        
+        Record* recordForGameCenter = [[Record alloc] initWithName:name date:dateString time:timeUsed rowNum:rowNum colNum:colNum mineNum:totalMines];
+        PlayerModel* player = [[PlayerModel alloc] init];
+        
+        [player submitRecord:recordForGameCenter];
+        
+        [self vibrate];
+        [self performSelector:@selector(vibrate) withObject:nil afterDelay:0.7];
+        
     } else {
         [delegateToShow setRestartButtonImageForFailure];
+        
+        [self vibrate];
     }
     
 }
@@ -316,6 +341,17 @@
     //数字格周围的标旗数量恰好等于自身数字时，双击才能点开周围一圈格子
     if (totalMarkAround == targetCell.value) {
         [self spreadAroundOfRow:i column:j];
+        
+    } else {
+        NSArray* surroundingPoints = [self arrayOfSurroundingPointsOfRow:i column:j];
+        for (NSValue* element in surroundingPoints) {
+            CGPoint point = [element CGPointValue];
+            int i = point.y;
+            int j = point.x;
+            CellView* cell = matrix[i][j];
+            [cell pressDown];
+            [cell performSelector:@selector(restore) withObject:nil afterDelay:0.15];
+        }
     }
 }
 
@@ -353,5 +389,11 @@
     return arrayOfSurroundingPoints;
 }
 
+- (void)vibrate {
+    if ([[NSUserDefaults standardUserDefaults] boolForKey:@"forbiddenVibrate"]) {
+        return;
+    }
+    AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);
+}
 
 @end
