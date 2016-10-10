@@ -113,12 +113,15 @@
 - (void)handleSwipe:(UISwipeGestureRecognizer*)sender {
     IntPoint cellPoint = [self transformToIntPointFromViewPoint:[sender locationInView:self]];
     CellView* swipeCell = matrix[cellPoint.y][cellPoint.x];
+    
+    NSValue* intPointValue = [NSValue value:&cellPoint withObjCType:@encode(IntPoint)];
+    
     if (swipeCell.marked == NO && swipeCell.detected == NO) {
         minesLeftToMark -= 1;
-        [markedPointSet addObject:[NSValue valueWithCGPoint:CGPointMake(cellPoint.x, cellPoint.y)]];
+        [markedPointSet addObject:intPointValue];
     } else if (swipeCell.marked == YES) {
         minesLeftToMark += 1;
-        [markedPointSet removeObject:[NSValue valueWithCGPoint:CGPointMake(cellPoint.x, cellPoint.y)]];
+        [markedPointSet removeObject:intPointValue];
     }
     [swipeCell mark];
     
@@ -138,7 +141,9 @@
         [matrix[cellPoint.y][cellPoint.x] pressDown];
         
         //处于按压状态的格子保存到集合中，在手指离开屏幕时再还原这些格子
-        [pressedPointSet addObject:[NSValue valueWithCGPoint:locationPoint]];
+        NSValue* intPointValue = [NSValue value:&cellPoint withObjCType:@encode(IntPoint)];
+        [pressedPointSet addObject:intPointValue];
+        
         if (hasEnded == NO) {
             [delegateToShow setRestartButtonHightlighted:YES];
         }
@@ -150,7 +155,8 @@
     //某些gesture没法被处理，因此，有的格子被touchesBegan处理后就一直处于pressing的状态，只有这些没有被处理的手势才会送到这个touchesEnded里面来
     while (pressedPointSet.count > 0) {
         NSValue* element = [pressedPointSet anyObject];
-        IntPoint cellPoint = [self transformToIntPointFromViewPoint:[element CGPointValue]];
+        IntPoint cellPoint;
+        [element getValue:&cellPoint];
         [matrix[cellPoint.y][cellPoint.x] restore];
         [pressedPointSet removeObject:element];
     }
@@ -205,7 +211,9 @@
             int value = 0;
             if ([mineIndexArray containsObject:@(i * colNum + j)] == YES) {
                 value = 9;
-                [minePointSet addObject:[NSValue valueWithCGPoint:CGPointMake(j, i)]];
+                IntPoint cellPoint = makeIntPoint(j, i);
+                NSValue *intPointValue = [NSValue value:&cellPoint withObjCType:@encode(IntPoint)];
+                [minePointSet addObject:intPointValue];
             }
             ((CellView*)matrix[i][j]).value = value;
         }
@@ -218,9 +226,10 @@
             if (((CellView*)matrix[i][j]).value == 0) {
                 NSArray* surroundingPoints = [self arrayOfSurroundingPointsOfRow:i column:j];
                 for (NSValue* element in surroundingPoints) {
-                    CGPoint point = [element CGPointValue];
-                    int pi = point.y;
-                    int pj = point.x;
+                    IntPoint cellPoint;
+                    [element getValue:&cellPoint];
+                    int pi = cellPoint.y;
+                    int pj = cellPoint.x;
                     
                     //有雷的格子value值是9，除以9之后会得到1，而其他任何格子的value除以8后都只能得到0
                     ((CellView*)matrix[i][j]).value += ( (CellView*)matrix[pi][pj] ).value/9;
@@ -244,7 +253,8 @@
     NSSet* pointsNeedToReveal = [minePointSet setByAddingObjectsFromSet:markedPointSet];
     
     for (NSValue* element in pointsNeedToReveal) {
-        CGPoint cellPoint = [element CGPointValue];
+        IntPoint cellPoint;
+        [element getValue:&cellPoint];
         int i = cellPoint.y;
         int j = cellPoint.x;
         
@@ -331,9 +341,10 @@
     int totalMarkAround = 0;
     NSArray* surroundingPoints = [self arrayOfSurroundingPointsOfRow:i column:j];
     for (NSValue* element in surroundingPoints) {
-        CGPoint point = [element CGPointValue];
-        int pi = point.y;
-        int pj = point.x;
+        IntPoint cellPoint;
+        [element getValue:&cellPoint];
+        int pi = cellPoint.y;
+        int pj = cellPoint.x;
         if (((CellView*)matrix[pi][pj]).marked == YES) {
             totalMarkAround += 1;
         }
@@ -345,9 +356,10 @@
     } else {
         NSArray* surroundingPoints = [self arrayOfSurroundingPointsOfRow:i column:j];
         for (NSValue* element in surroundingPoints) {
-            CGPoint point = [element CGPointValue];
-            int i = point.y;
-            int j = point.x;
+            IntPoint cellPoint;
+            [element getValue:&cellPoint];
+            int i = cellPoint.y;
+            int j = cellPoint.x;
             CellView* cell = matrix[i][j];
             [cell pressDown];
             [cell performSelector:@selector(restore) withObject:nil afterDelay:0.15];
@@ -358,34 +370,55 @@
 - (void)spreadAroundOfRow:(int)i column:(int)j {
     NSArray* surroundingPoints = [self arrayOfSurroundingPointsOfRow:i column:j];
     for (NSValue* element in surroundingPoints) {
-        CGPoint point = [element CGPointValue];
-        [self openCellOfRow:point.y column:point.x];
+        IntPoint cellPoint;
+        [element getValue:&cellPoint];
+        int i = cellPoint.y;
+        int j = cellPoint.x;
+        [self openCellOfRow:i column:j];
     }
 }
 
 - (NSArray*)arrayOfSurroundingPointsOfRow:(int)i column:(int)j {
     NSArray* arrayOfSurroundingPoints = [[NSArray alloc] init];
+    
+    IntPoint upPoint = makeIntPoint(j, i-1);
+    IntPoint upRightPoint = makeIntPoint(j+1, i-1);
+    IntPoint rightPoint = makeIntPoint(j+1, i);
+    IntPoint downRightPoint = makeIntPoint(j+1, i+1);
+    IntPoint downPoint = makeIntPoint(j, i+1);
+    IntPoint downLeftPoint = makeIntPoint(j-1, i+1);
+    IntPoint leftPoint = makeIntPoint(j-1, i);
+    IntPoint upLeftPoint = makeIntPoint(j-1, i-1);
+    
+    NSValue *up = [NSValue value:&upPoint withObjCType:@encode(IntPoint)];
+    NSValue *upRight = [NSValue value:&upRightPoint withObjCType:@encode(IntPoint)];
+    NSValue *right = [NSValue value:&rightPoint withObjCType:@encode(IntPoint)];
+    NSValue *downRight = [NSValue value:&downRightPoint withObjCType:@encode(IntPoint)];
+    NSValue *down = [NSValue value:&downPoint withObjCType:@encode(IntPoint)];
+    NSValue *downLeft = [NSValue value:&downLeftPoint withObjCType:@encode(IntPoint)];
+    NSValue *left = [NSValue value:&leftPoint withObjCType:@encode(IntPoint)];
+    NSValue *upLeft = [NSValue value:&upLeftPoint withObjCType:@encode(IntPoint)];
+    
     if (i == 0 && j == 0) {
-        arrayOfSurroundingPoints = @[[NSValue valueWithCGPoint:CGPointMake(j+1, i)], [NSValue valueWithCGPoint:CGPointMake(j+1, i+1)], [NSValue valueWithCGPoint:CGPointMake(j, i+1)]];
-    } else if (i == 0 && j == colNum-1) {
-        arrayOfSurroundingPoints = @[[NSValue valueWithCGPoint:CGPointMake(j-1, i)], [NSValue valueWithCGPoint:CGPointMake(j-1, i+1)], [NSValue valueWithCGPoint:CGPointMake(j, i+1)]];
-    } else if (i == rowNum-1 && j == 0) {
-        arrayOfSurroundingPoints = @[[NSValue valueWithCGPoint:CGPointMake(j, i-1)], [NSValue valueWithCGPoint:CGPointMake(j+1, i-1)], [NSValue valueWithCGPoint:CGPointMake(j+1, i)]];
-    } else if (i == rowNum-1 && j == colNum-1) {
-        arrayOfSurroundingPoints = @[[NSValue valueWithCGPoint:CGPointMake(j, i-1)], [NSValue valueWithCGPoint:CGPointMake(j-1, i-1)], [NSValue valueWithCGPoint:CGPointMake(j-1, i)]];
-        
+        arrayOfSurroundingPoints = @[right, downRight, down];
+    } else if (i == 0 && j == colNum - 1) {
+        arrayOfSurroundingPoints = @[left, downLeft, down];
+    } else if (i == rowNum - 1 && j == 0) {
+        arrayOfSurroundingPoints = @[up, upRight, right];
+    } else if (i == rowNum - 1 && j == colNum - 1) {
+        arrayOfSurroundingPoints = @[left, upLeft, up];
     } else if (i == 0) {
-        arrayOfSurroundingPoints = @[[NSValue valueWithCGPoint:CGPointMake(j+1, i)], [NSValue valueWithCGPoint:CGPointMake(j+1, i+1)], [NSValue valueWithCGPoint:CGPointMake(j, i+1)], [NSValue valueWithCGPoint:CGPointMake(j-1, i+1)], [NSValue valueWithCGPoint:CGPointMake(j-1, i)]];
-    } else if (i == rowNum-1) {
-        arrayOfSurroundingPoints = @[[NSValue valueWithCGPoint:CGPointMake(j-1, i)], [NSValue valueWithCGPoint:CGPointMake(j-1, i-1)], [NSValue valueWithCGPoint:CGPointMake(j, i-1)], [NSValue valueWithCGPoint:CGPointMake(j+1, i-1)], [NSValue valueWithCGPoint:CGPointMake(j+1, i)]];
+        arrayOfSurroundingPoints = @[left, downLeft, down, downRight, right];
+    } else if (i == rowNum - 1) {
+        arrayOfSurroundingPoints = @[left, upLeft, up, upRight, right];
     } else if (j == 0) {
-        arrayOfSurroundingPoints = @[[NSValue valueWithCGPoint:CGPointMake(j, i-1)], [NSValue valueWithCGPoint:CGPointMake(j+1, i-1)], [NSValue valueWithCGPoint:CGPointMake(j+1, i)], [NSValue valueWithCGPoint:CGPointMake(j+1, i+1)], [NSValue valueWithCGPoint:CGPointMake(j, i+1)]];
-    } else if (j == colNum-1) {
-        arrayOfSurroundingPoints = @[[NSValue valueWithCGPoint:CGPointMake(j, i-1)], [NSValue valueWithCGPoint:CGPointMake(j-1, i-1)], [NSValue valueWithCGPoint:CGPointMake(j-1, i)], [NSValue valueWithCGPoint:CGPointMake(j-1, i+1)], [NSValue valueWithCGPoint:CGPointMake(j, i+1)]];
-        
+        arrayOfSurroundingPoints = @[up, upRight, right, downRight, down];
+    } else if (j == colNum - 1) {
+        arrayOfSurroundingPoints = @[up, upLeft, left, downLeft, down];
     } else {
-        arrayOfSurroundingPoints = @[[NSValue valueWithCGPoint:CGPointMake(j, i-1)], [NSValue valueWithCGPoint:CGPointMake(j+1, i-1)], [NSValue valueWithCGPoint:CGPointMake(j+1, i)], [NSValue valueWithCGPoint:CGPointMake(j+1, i+1)], [NSValue valueWithCGPoint:CGPointMake(j, i+1)], [NSValue valueWithCGPoint:CGPointMake(j-1, i+1)], [NSValue valueWithCGPoint:CGPointMake(j-1, i)], [NSValue valueWithCGPoint:CGPointMake(j-1, i-1)]];
+        arrayOfSurroundingPoints = @[up,upRight,right,downRight,down,downLeft,left,upLeft];
     }
+    
     return arrayOfSurroundingPoints;
 }
 
@@ -394,6 +427,13 @@
         return;
     }
     AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);
+}
+
+struct IntPoint makeIntPoint(int x, int y) {
+    struct IntPoint temp;
+    temp.x = x;
+    temp.y = y;
+    return temp;
 }
 
 @end

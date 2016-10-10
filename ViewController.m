@@ -12,6 +12,8 @@
 #import "InformationBoard.h"
 #import "GameView.h"
 
+#define APPROXIMATE_SIDE_LENGTH 40
+#define APPROXIMATE_PROPORTION_OF_BOARD_HEIGHT_TO_SIDE 2.7
 
 @interface ViewController ()
 
@@ -49,9 +51,9 @@
     
     CGFloat width = self.view.frame.size.width;
     CGFloat height = self.view.frame.size.height;
-    int colNum = width / 40.0;
+    int colNum = width / APPROXIMATE_SIDE_LENGTH;
     CGFloat side = width / colNum;
-    int rowNum = height/ side - 2.7;
+    int rowNum = height/ side - APPROXIMATE_PROPORTION_OF_BOARD_HEIGHT_TO_SIDE;
     CGFloat gameViewHeight = width * rowNum/colNum;
     CGRect frameBeforeLoading = CGRectMake(0, height, width, gameViewHeight);
     CGRect frameAfterLoading = CGRectMake(0, height - gameViewHeight, width, gameViewHeight);
