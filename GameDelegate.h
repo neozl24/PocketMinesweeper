@@ -14,8 +14,8 @@
 - (void)setRestartButtonImageForNormal;
 - (void)setRestartButtonImageForWinning;
 - (void)setRestartButtonImageForFailure;
-- (void)setMinesNum:(int)minesNum;
-- (void)setSeconds:(int)seconds;
+- (void)setMinesNum:(NSInteger)minesNum;
+- (void)setSeconds:(NSUInteger)seconds;
 
 @end
 

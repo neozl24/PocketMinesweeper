@@ -111,11 +111,11 @@
     [rightPath fill];
 }
 
-- (void)setMinesNum:(int)num {
+- (void)setMinesNum:(NSInteger)num {
     [minesNumView setDigit:num];
 }
 
-- (void)setSeconds:(int)seconds {
+- (void)setSeconds:(NSUInteger)seconds {
     [secondsView setDigit:seconds];
 }
 

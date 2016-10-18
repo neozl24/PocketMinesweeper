@@ -80,29 +80,29 @@
     [rightPath fill];
 }
 
-- (void)setDigit:(int)newDigit {
+- (void)setDigit:(NSInteger)newDigit {
     digit = newDigit;
-    digitLabel.text = [NSString stringWithFormat:@"%i",digit];
+    digitLabel.text = [NSString stringWithFormat:@"%lu",(unsigned long)digit];
     if (digit > 999) {
         digitLabel.text = [NSString stringWithFormat:@"999"];
         digitLabel.textColor = [UIColor redColor];
     } else if (digit > 99) {
-        digitLabel.text = [NSString stringWithFormat:@"%i",digit];
+        digitLabel.text = [NSString stringWithFormat:@"%lu",digit];
         digitLabel.textColor = [UIColor redColor];
     } else if (digit > 9) {
-        digitLabel.text = [NSString stringWithFormat:@"0%i",digit];
+        digitLabel.text = [NSString stringWithFormat:@"0%lu",digit];
         digitLabel.textColor = [UIColor redColor];
     } else if (digit >= 0) {
-        digitLabel.text = [NSString stringWithFormat:@"00%i",digit];
+        digitLabel.text = [NSString stringWithFormat:@"00%lu",digit];
         digitLabel.textColor = [UIColor redColor];
     } else if (digit > -10) {
-        digitLabel.text = [NSString stringWithFormat:@"00%i", -digit];
+        digitLabel.text = [NSString stringWithFormat:@"00%lu", -digit];
         digitLabel.textColor = [UIColor yellowColor];
     } else if (digit > -100) {
-        digitLabel.text = [NSString stringWithFormat:@"0%i", -digit];
+        digitLabel.text = [NSString stringWithFormat:@"0%lu", -digit];
         digitLabel.textColor = [UIColor yellowColor];
     } else if (digit > -1000) {
-        digitLabel.text = [NSString stringWithFormat:@"%i", -digit];
+        digitLabel.text = [NSString stringWithFormat:@"%lu", -digit];
         digitLabel.textColor = [UIColor yellowColor];
     } else {
         digitLabel.text = [NSString stringWithFormat:@"999"];

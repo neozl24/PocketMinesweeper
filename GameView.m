@@ -58,7 +58,7 @@
     
     [delegateToShow setRestartButtonImageForNormal];
     [delegateToShow setMinesNum:minesLeftToMark];
-    [delegateToShow setSeconds:(int)timeUsed];
+    [delegateToShow setSeconds:(NSUInteger)timeUsed];
     
 }
 

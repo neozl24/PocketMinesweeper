@@ -19,8 +19,8 @@ typedef struct IntPoint IntPoint;
 
 @interface GameView : UIView{
     
-    int numOfCellsOpened;
-    int minesLeftToMark;
+    NSUInteger numOfCellsOpened;
+    NSUInteger minesLeftToMark;
     
     BOOL hasBegun;
     BOOL hasEnded;

@@ -14,8 +14,8 @@
     UILabel* digitLabel;
 }
 
-@property (nonatomic) int digit;
+@property (nonatomic) NSInteger digit;
 
-- (void)setDigit:(int)newDigit;
+- (void)setDigit:(NSInteger)newDigit;
 
 @end

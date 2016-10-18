@@ -11,8 +11,8 @@
 #import "DigitView.h"
 
 @interface InformationBoard : UIView <GameViewDelegate> {
-    float width;
-    float height;
+    CGFloat width;
+    CGFloat height;
     DigitView* minesNumView;
     DigitView* secondsView;
     UIButton* restartButton;
