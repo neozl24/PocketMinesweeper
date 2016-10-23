@@ -12,9 +12,13 @@
 #import "Record.h"
 
 @interface ListViewController () {
-    NSMutableSet* selectedIndexPathSet;
     BOOL isStatusBarHidden;
     BOOL forbiddenVibrate;
+    BOOL permitted3DTouch;
+    
+    NSMutableSet* selectedIndexPathSet;
+    
+    UISwitch* switchFor3DTouch;
 }
 
 @end
@@ -36,8 +40,9 @@
     self.navigationItem.title = @"英雄榜";
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"完成" style:UIBarButtonItemStylePlain target:self action:@selector(getBackToGame)];
     
-    //第一次调用这个值时得到的是0，即为NO
-    forbiddenVibrate = [[NSUserDefaults standardUserDefaults] boolForKey:@"forbiddenVibrate"];    
+    //第一次调用这个值，即还没初始化记录时得到的是0，也就是NO。所以我才这样起名，因为我希望默认允许震动，关闭3D Touch
+    forbiddenVibrate = [[NSUserDefaults standardUserDefaults] boolForKey:@"forbiddenVibrate"];
+    permitted3DTouch = [[NSUserDefaults standardUserDefaults] boolForKey:@"permitted3DTouch"];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -79,7 +84,7 @@
     if (section == 0) {
         return [[RecordList sharedList] allRecords].count;
     } else {
-        return 3;
+        return 4;
     }
 }
 
@@ -225,7 +230,6 @@
         
     } else if (indexPath.section == 1) {
         
-        
         if (indexPath.row == 0) {
             cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"switchCell"];
             [cell setSelectionStyle:UITableViewCellSelectionStyleNone];
@@ -236,11 +240,28 @@
             cell.accessoryView = switchView;
             
         } else if (indexPath.row == 1) {
+            cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"switchCell"];
+            [cell setSelectionStyle:UITableViewCellSelectionStyleNone];
+            cell.textLabel.text = @"3D Touch标雷（需设备支持）";
+            
+            switchFor3DTouch = [[UISwitch alloc] init];
+            if (self.traitCollection.forceTouchCapability == UIForceTouchCapabilityAvailable) {
+                switchFor3DTouch.enabled = YES;
+                [switchFor3DTouch setOn:permitted3DTouch];
+                [switchFor3DTouch addTarget:self action:@selector(update3DTouchSwitch:) forControlEvents:UIControlEventValueChanged];
+               
+            } else {
+                switchFor3DTouch.enabled = NO;
+                [switchFor3DTouch setOn:NO];
+            }
+            cell.accessoryView = switchFor3DTouch;
+            
+        } else if (indexPath.row == 2) {
             cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"linkCell"];
             cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
             cell.textLabel.text = @"操作说明";
             
-        } else if (indexPath.row == 2) {
+        } else if (indexPath.row == 3) {
             cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"linkCell"];
             cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
             cell.textLabel.text = @"GameCenter排行";
@@ -263,18 +284,17 @@
         
         
     } else if (indexPath.section == 1) {
-        if (indexPath.row == 1) {
+        if (indexPath.row == 2) {
             InstructionViewController* instructionViewController = [[InstructionViewController alloc] init];
             [self.navigationController pushViewController:instructionViewController animated:YES];
             
-        } else if (indexPath.row == 2) {
+        } else if (indexPath.row == 3) {
             GKGameCenterViewController * gcViewController = [[GKGameCenterViewController alloc] init];
             gcViewController.gameCenterDelegate = self;
             [self presentViewController:gcViewController animated:YES completion:nil];
             
             [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
         }
-        
     }
 }
 
@@ -289,6 +309,11 @@
     [[NSUserDefaults standardUserDefaults] setBool:forbiddenVibrate forKey:@"forbiddenVibrate"];
 }
 
+- (IBAction)update3DTouchSwitch:(id)sender {
+    permitted3DTouch = !permitted3DTouch;
+    [[NSUserDefaults standardUserDefaults] setBool:permitted3DTouch forKey:@"permitted3DTouch"];
+}
+
 - (void)getBackToGame {
     [self dismissViewControllerAnimated:YES completion:^{
         [delegate continueGame];
@@ -297,6 +322,17 @@
 
 - (void)gameCenterViewControllerDidFinish:(GKGameCenterViewController *)gameCenterViewController {
     [self dismissViewControllerAnimated:YES completion:nil];
+}
+
+//如果用户刻意地修改了系统的3D touch支持功能，下面这个函数能对变化进行监听
+- (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
+    if (self.traitCollection.forceTouchCapability == UIForceTouchCapabilityAvailable) {
+        switchFor3DTouch.enabled = YES;
+        [switchFor3DTouch setOn:permitted3DTouch];
+    } else {
+        switchFor3DTouch.enabled = NO;
+        [switchFor3DTouch setOn:NO];
+    }
 }
 
 @end

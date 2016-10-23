@@ -1,6 +1,6 @@
 //
 //  ViewController.m
-//  Minesweeper
+//  PocketMinesweeper
 //
 //  Created by 钟立 on 16/9/20.
 //  Copyright © 2016年 钟立. All rights reserved.
@@ -9,7 +9,7 @@
 #import "ViewController.h"
 #import "ListViewController.h"
 #import "RecordList.h"
-#import "InformationBoard.h"
+#import "InformationView.h"
 #import "GameView.h"
 
 #define APPROXIMATE_SIDE_LENGTH 40
@@ -65,7 +65,7 @@
     
     CGRect boardFrameAfterLoading = CGRectMake(0, 0, width, 2 * side);
     CGRect boardFrameBeforeLoading = CGRectMake(0, -4 * side, width, 2 * side);
-    boardView = [[InformationBoard alloc] initWithFrame:boardFrameBeforeLoading];
+    boardView = [[InformationView alloc] initWithFrame:boardFrameBeforeLoading];
     [self.view addSubview:boardView];
     
     [UIView animateWithDuration:0.6 delay:0 options:UIViewAnimationOptionCurveEaseOut animations:^(){
@@ -97,6 +97,7 @@
 
 - (void)continueGame {
     [gameView.gameTimer setFireDate:[NSDate date]];
+    [gameView checkAvailability];
 }
 
 - (void)getPlayerName {

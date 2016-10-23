@@ -26,12 +26,14 @@ typedef struct IntPoint IntPoint;
     BOOL hasEnded;
     BOOL success;
     
+    BOOL isVibrationAvailable;
+    BOOL is3DTouchAvailable;
+    
     NSMutableArray* matrix;
     
     NSMutableSet* pressedPointSet;
     NSMutableSet* minePointSet;
     NSMutableSet* markedPointSet;
-
 }
 
 @property (nonatomic) int rowNum, colNum;
@@ -63,6 +65,7 @@ typedef struct IntPoint IntPoint;
 
 - (void)updateTimer;
 
+- (void)checkAvailability;
 - (void)vibrate;
 
 @end

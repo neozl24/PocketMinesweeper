@@ -14,7 +14,7 @@
     ViewController* mainViewController;
 }
 
-@property (strong, nonatomic) UIWindow *window;
+@property (nonatomic, strong) UIWindow *window;
 
 @property NSString* currentPlayerID;
 @property BOOL gameCenterAuthenticationComplete;

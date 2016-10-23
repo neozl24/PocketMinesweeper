@@ -1,6 +1,6 @@
 //
 //  CellView.m
-//  Minesweeper
+//  PocketMinesweeper
 //
 //  Created by 钟立 on 16/8/20.
 //  Copyright © 2016年 钟立. All rights reserved.

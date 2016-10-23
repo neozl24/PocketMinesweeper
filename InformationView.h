@@ -1,5 +1,5 @@
 //
-//  InformationBoard.h
+//  InformationView.h
 //  PocketMinesweeper
 //
 //  Created by 钟立 on 16/9/1.
@@ -10,7 +10,7 @@
 #import "GameDelegate.h"
 #import "DigitView.h"
 
-@interface InformationBoard : UIView <GameViewDelegate> {
+@interface InformationView : UIView <GameViewDelegate> {
     CGFloat width;
     CGFloat height;
     DigitView* minesNumView;

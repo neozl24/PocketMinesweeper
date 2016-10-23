@@ -8,9 +8,17 @@
 
 #import <GameKit/GameKit.h>
 #import "GameView.h"
+#import "DragExitGestureRecognizer.h"
+#import "PressGestureRecognizer.h"
 #import "Record.h"
 #import "RecordList.h"
 #import "PlayerModel.h"
+
+@interface GameView () {
+    PressGestureRecognizer* press;
+}
+
+@end
 
 @implementation GameView
 
@@ -24,10 +32,10 @@
         rowNum = rows;
         colNum = columns;
         side = sideLength;
+        [self createCells];
+        [self addGestureRecognizers];
+        [self checkAvailability];
     }
-    
-    [self createCells];
-    [self addGestureRecognizers];
     return self;
 }
 
@@ -70,9 +78,10 @@
     longTap.minimumPressDuration = 0.5;
     [self addGestureRecognizer:longTap];
     
-    UISwipeGestureRecognizer* swipeUp = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(handleSwipe:)];
-    swipeUp.direction = UISwipeGestureRecognizerDirectionUp;
-    [self addGestureRecognizer:swipeUp];
+    DragExitGestureRecognizer* dragExit = [[DragExitGestureRecognizer alloc] initWithTarget:self action:@selector(handleSwipe:)];
+    [self addGestureRecognizer:dragExit];
+    
+    press = [[PressGestureRecognizer alloc] initWithTarget:self action:@selector(handleSwipe:)];
 }
 
 - (void)handleTap:(UITapGestureRecognizer*)sender {
@@ -89,7 +98,7 @@
         [self openCellOfRow:cellPoint.y column:cellPoint.x];
     }
     
-    [delegateToShow setRestartButtonHightlighted:NO];
+    [delegateToShow setRestartButtonHighlighted:NO];
 }
 
 - (void)handleDoubleTap:(UITapGestureRecognizer*)sender {
@@ -99,15 +108,7 @@
         [self doubleClickOpenRow:cellPoint.y column:cellPoint.x];
     }
     
-    [delegateToShow setRestartButtonHightlighted:NO];
-}
-
-- (void)handleLongPress:(UISwipeGestureRecognizer*)sender {
-    
-    //这里加上条件判断，确保长按时间之内，mark方法不会重复调用，只会调用一次
-    if (sender.state == UIGestureRecognizerStateBegan) {
-        [self handleSwipe:sender];
-    }
+    [delegateToShow setRestartButtonHighlighted:NO];
 }
 
 - (void)handleSwipe:(UISwipeGestureRecognizer*)sender {
@@ -126,15 +127,19 @@
     [swipeCell mark];
     
     [delegateToShow setMinesNum:minesLeftToMark];
-    [delegateToShow setRestartButtonHightlighted:NO];
+    [delegateToShow setRestartButtonHighlighted:NO];
 }
 
+- (void)handleLongPress:(UISwipeGestureRecognizer*)sender {
+    //这里加上条件判断，确保长按时间之内，mark方法不会重复调用，只会调用一次
+    if (sender.state == UIGestureRecognizerStateBegan) {
+        [self handleSwipe:sender];
+    }
+}
 
 - (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
-    
     for (UITouch* t in touches) {
-        CGPoint locationPoint = [t locationInView:self];
-        
+        CGPoint locationPoint = [t locationInView:self];        
         IntPoint cellPoint = [self transformToIntPointFromViewPoint:locationPoint];
         
         //注意cellPoint的坐标值如果是(2,3)，则它在矩阵中的含义是第3排第2个，不是第2排第3个！
@@ -145,10 +150,9 @@
         [pressedPointSet addObject:intPointValue];
         
         if (hasEnded == NO) {
-            [delegateToShow setRestartButtonHightlighted:YES];
+            [delegateToShow setRestartButtonHighlighted:YES];
         }
     }
-    
 }
 
 - (void)touchesEnded:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
@@ -161,7 +165,7 @@
         [pressedPointSet removeObject:element];
     }
     
-    [delegateToShow setRestartButtonHightlighted:NO];
+    [delegateToShow setRestartButtonHighlighted:NO];
 }
 
 - (IntPoint)transformToIntPointFromViewPoint:(CGPoint)viewPoint {
@@ -262,8 +266,7 @@
             [matrix[i][j] reveal];
         } else if ( ((CellView*)matrix[i][j]).marked == NO) {
             [matrix[i][j] mark];
-        }
-        
+        }        
     }
     
     if (success == YES) {
@@ -298,9 +301,7 @@
         
         [self vibrate];
     }
-    
 }
-
 
 - (void)openCellOfRow:(int)i column:(int)j {
     CellView* targetCell = matrix[i][j];
@@ -422,8 +423,19 @@
     return arrayOfSurroundingPoints;
 }
 
+- (void)checkAvailability {
+    isVibrationAvailable = ![[NSUserDefaults standardUserDefaults] boolForKey:@"forbiddenVibrate"];
+    is3DTouchAvailable = [[NSUserDefaults standardUserDefaults] boolForKey:@"permitted3DTouch"];
+    
+    if (is3DTouchAvailable) {
+        [self addGestureRecognizer:press];
+    } else {
+        [self removeGestureRecognizer:press];
+    }
+}
+
 - (void)vibrate {
-    if ([[NSUserDefaults standardUserDefaults] boolForKey:@"forbiddenVibrate"]) {
+    if (isVibrationAvailable == NO) {
         return;
     }
     AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);

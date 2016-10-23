@@ -10,7 +10,7 @@
 
 @protocol GameViewDelegate <NSObject>
 
-- (void)setRestartButtonHightlighted:(BOOL)hightlighted;
+- (void)setRestartButtonHighlighted:(BOOL)highlighted;
 - (void)setRestartButtonImageForNormal;
 - (void)setRestartButtonImageForWinning;
 - (void)setRestartButtonImageForFailure;

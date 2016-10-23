@@ -1,14 +1,14 @@
 //
-//  InformationBoard.m
+//  InformationView.m
 //  PocketMinesweeper
 //
 //  Created by 钟立 on 16/9/1.
 //  Copyright © 2016年 钟立. All rights reserved.
 //
 
-#import "InformationBoard.h"
+#import "InformationView.h"
 
-@implementation InformationBoard
+@implementation InformationView
 
 @synthesize delegate;
 
@@ -119,7 +119,7 @@
     [secondsView setDigit:seconds];
 }
 
-- (void)setRestartButtonHightlighted:(BOOL)state {
+- (void)setRestartButtonHighlighted:(BOOL)state {
     restartButton.highlighted = state;
 }
 
