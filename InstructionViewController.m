@@ -22,8 +22,6 @@
     self.view.backgroundColor = [UIColor whiteColor];
     self.navigationItem.title = @"操作说明";
     
-    
- 
 //    textView的第一次加载总是会卡一下，忍无可忍，尽管用多线程会强一点点，但还是不能忍受
 //    CGRect textViewFrame = self.view.bounds;
 //    textViewFrame.origin.x = 15;
@@ -57,7 +55,7 @@
 }
 
 - (void)showText {
-    NSString* instructionText = @"\n✪ 向上滑动或者长按，都可以为格子标上旗子，注意向上滑扫的手势往往更省时间\n\n✪ 如果数字格的周围已标上对应数量的旗子，双击可以快速点开周围没有打开的格子。记住，假如你标错了旗子，双击会让你踩中周围的雷而导致游戏失败。双击会大大提升你的效率，但是恰当的单双击结合往往才是最高效的选择\n\n✪ 当点开所有的非雷区域时，游戏成功，这也意味着你不必为所有有雷的格子标上旗子，每一位扫雷高手都明白如何在这里节约时间\n\n✪ 一旦你的用时排在本机历史前5，就可以进入英雄榜了。如果登录了GameCenter，则会将该账户的最佳成绩上传到相应榜单，从而与其他玩家一较高下。";
+    NSString* instructionText = @"\n✪ 长按，重压（需要3D Touch功能的支持），或者往任意方向滑扫，都可以为格子标上旗子，其中滑扫的手势可能最省时间\n\n✪ 如果数字格的周围已标上对应数量的旗子，双击可以快速点开周围没有打开的格子。注意，假如你标错了旗子，双击会让你踩中周围的雷而导致游戏失败。双击会大大提升你的效率，但是恰当的单双击结合往往才是最高效的选择\n\n✪ 当点开所有的非雷区域时，游戏成功，这也意味着你不必为所有有雷的格子标上旗子，每一位扫雷高手都明白如何在这里节约时间\n\n✪ 一旦你的用时排在本机历史前5，就可以进入英雄榜了。如果登录了GameCenter，则会将该账户的最佳成绩上传到相应榜单，从而与其他玩家一较高下。";
     
     CGFloat labelWidth = self.view.bounds.size.width - 40;
     scrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(20, 0, labelWidth, self.view.bounds.size.height - 80)];
