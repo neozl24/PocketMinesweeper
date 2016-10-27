@@ -15,7 +15,8 @@
 #import "PlayerModel.h"
 
 @interface GameView () {
-    PressGestureRecognizer* press;
+    PressGestureRecognizer *press;
+    NSMutableArray<UITapGestureRecognizer *> *doubleTapArray;
 }
 
 @end
@@ -32,6 +33,7 @@
         rowNum = rows;
         colNum = columns;
         side = sideLength;
+        
         [self createCells];
         [self addGestureRecognizers];
         [self checkAvailability];
@@ -60,7 +62,9 @@
     
     for (int i = 0; i < rowNum; i++) {
         for (int j = 0; j < colNum; j++) {
-            [matrix[i][j] reset];
+            CellView *cell = matrix[i][j];
+            [cell reset];
+            [cell removeGestureRecognizer:doubleTapArray[i * colNum + j]];
         }
     }
     
@@ -177,6 +181,8 @@
 
 - (void)createCells {
     matrix = [[NSMutableArray alloc] init];
+    doubleTapArray = [[NSMutableArray alloc] init];
+    
     for (int i = 0; i < rowNum; i++) {
         NSMutableArray *cellRow = [[NSMutableArray alloc] init];
         
@@ -186,6 +192,10 @@
             CellView* cell = [[CellView alloc] initWithFrame:frame value:0];
             [cellRow addObject:cell];
             [self addSubview:cell];
+            
+            UITapGestureRecognizer *doubleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleDoubleTap:)];
+            doubleTap.numberOfTapsRequired = 2;
+            [doubleTapArray addObject:doubleTap];
         }
         [matrix addObject:cellRow];
     }
@@ -314,9 +324,7 @@
             return;
         } else if (targetCell.value > 0) {
             //之所以把gesture加在这里，而不是整体的gameView里面，是因为不希望还未点开的格子就能够接收双击指令，否则有可能直接延展了某个未知格子而导致无意踩雷
-            UITapGestureRecognizer* doubleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleDoubleTap:)];
-            doubleTap.numberOfTapsRequired = 2;
-            [targetCell addGestureRecognizer:doubleTap];
+            [targetCell addGestureRecognizer:doubleTapArray[i * colNum + j]];
         }
         
         numOfCellsOpened += 1;
