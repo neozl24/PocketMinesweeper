@@ -388,7 +388,7 @@
 }
 
 - (NSArray*)arrayOfSurroundingPointsOfRow:(int)i column:(int)j {
-    NSArray* arrayOfSurroundingPoints = [[NSArray alloc] init];
+    NSArray* arrayOfSurroundingPoints;
     
     IntPoint upPoint = makeIntPoint(j, i-1);
     IntPoint upRightPoint = makeIntPoint(j+1, i-1);
