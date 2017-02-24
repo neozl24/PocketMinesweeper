@@ -435,10 +435,9 @@
     isVibrationAvailable = ![[NSUserDefaults standardUserDefaults] boolForKey:@"forbiddenVibrate"];
     is3DTouchAvailable = [[NSUserDefaults standardUserDefaults] boolForKey:@"permitted3DTouch"];
     
+    [self removeGestureRecognizer:press];
     if (is3DTouchAvailable) {
         [self addGestureRecognizer:press];
-    } else {
-        [self removeGestureRecognizer:press];
     }
 }
 

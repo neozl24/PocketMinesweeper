@@ -125,7 +125,9 @@
     
     ListViewController* listViewController = [[ListViewController alloc] init];
     [listViewController setModalTransitionStyle:UIModalTransitionStyleCoverVertical];
-    listViewController.delegate = self;
+    listViewController.dismissBlock = ^{
+        [self continueGame];
+    };
     
     UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:listViewController];
     

@@ -21,7 +21,7 @@
 
 - (void)loadGame;
 - (void)reloadGame;
-
+- (void)continueGame;
 
 @end
 
