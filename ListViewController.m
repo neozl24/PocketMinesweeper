@@ -25,8 +25,6 @@
 
 @implementation ListViewController
 
-@synthesize delegate;
-
 - (void)viewDidLoad {
     [super viewDidLoad];
     
@@ -315,9 +313,7 @@
 }
 
 - (void)getBackToGame {
-    [self dismissViewControllerAnimated:YES completion:^{
-        [delegate continueGame];
-    }];
+    [self dismissViewControllerAnimated:YES completion:self.dismissBlock];
 }
 
 - (void)gameCenterViewControllerDidFinish:(GKGameCenterViewController *)gameCenterViewController {

@@ -13,6 +13,6 @@
 
 @interface ListViewController : UITableViewController <GKGameCenterControllerDelegate>
 
-@property (nonatomic, weak) id <GameControlDelegate> delegate;
+@property (nonatomic, copy) void (^dismissBlock)(void);
 
 @end
